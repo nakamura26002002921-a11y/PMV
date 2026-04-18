@@ -176,7 +176,7 @@ double compute_volume(const std::vector<Region>& REGIONS,
     return total_volume;
 }
 
-PYBIND11_MODULE(module, m) {
+PYBIND11_MODULE(pmv_calc, m) {
     m.doc() = "compute_volume binding";
     m.def("compute_volume", &compute_volume,
           py::arg("REGIONS"),
