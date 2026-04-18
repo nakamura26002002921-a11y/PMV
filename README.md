@@ -50,11 +50,39 @@ conda activate pmv_calc_env
 ```bash
 mkdir build
 cd build
-cmake ..
+cmake .. \
+  -DCMAKE_PREFIX_PATH=$CONDA_PREFIX \
+  -DPython3_EXECUTABLE=$CONDA_PREFIX/bin/python
 make -j
 ```
 
 ビルドが成功すると、`pmv_calc*.so` が生成されます。
+
+## Build
+
+```bash
+mkdir build
+cd build
+
+cmake .. \
+  -DCMAKE_PREFIX_PATH=$CONDA_PREFIX \
+  -DPython3_EXECUTABLE=$CONDA_PREFIX/bin/python
+
+make -j
+```
+
+ビルドが成功すると、`pmv_calc*.so` が `build/` ディレクトリに生成されます。
+
+Pythonから利用するには、以下のいずれかを行ってください：
+
+* `build/` ディレクトリで実行する
+* または `PYTHONPATH` に追加する
+
+例：
+
+```bash
+export PYTHONPATH=$PWD/build:$PYTHONPATH
+```
 
 ---
 
@@ -66,10 +94,10 @@ make -j
 import pmv_calc
 
 result = pmv_calc.compute_volume(
-    REGIONS,
-    VERTICES,
-    POINTS,
-    RADIUS
+    REGIONS,   # Voronoi領域インデックス
+    VERTICES,  # Voronoi頂点座標
+    POINTS,    # 原子座標
+    RADIUS     # 半径
 )
 ```
 
@@ -79,6 +107,7 @@ result = pmv_calc.compute_volume(
 
 ```python
 import MDAnalysis as mda
+import pmv_calc
 
 u = mda.Universe("md.pdb", "centered.xtc")
 protein = u.select_atoms("protein")
@@ -89,6 +118,13 @@ for ts in u.trajectory:
 ```
 
 ---
+
+### 実行例
+
+```bash
+python python/main.py
+```
+
 
 ## Preprocessing (Important)
 
