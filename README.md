@@ -53,7 +53,8 @@ cd build
 
 cmake .. \
   -DCMAKE_PREFIX_PATH=$CONDA_PREFIX \
-  -DPython3_EXECUTABLE=$CONDA_PREFIX/bin/python
+  -DPython3_EXECUTABLE=$CONDA_PREFIX/bin/python \
+  -DCMAKE_BUILD_TYPE=Release
 
 make -j
 ```
