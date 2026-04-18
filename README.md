@@ -50,19 +50,6 @@ conda activate pmv_calc_env
 ```bash
 mkdir build
 cd build
-cmake .. \
-  -DCMAKE_PREFIX_PATH=$CONDA_PREFIX \
-  -DPython3_EXECUTABLE=$CONDA_PREFIX/bin/python
-make -j
-```
-
-ビルドが成功すると、`pmv_calc*.so` が生成されます。
-
-## Build
-
-```bash
-mkdir build
-cd build
 
 cmake .. \
   -DCMAKE_PREFIX_PATH=$CONDA_PREFIX \
