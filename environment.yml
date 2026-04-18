@@ -6,7 +6,7 @@ channels:
 
 dependencies:
   # Python
-  - python=3.10
+  - python=3.10.20
 
   # Python libs
   - numpy
@@ -19,14 +19,14 @@ dependencies:
   - compilers
 
   # C++ dependencies
-  - cgal
-  - eigen
-  - boost
+  - cgal=5.6
+  - eigen=3.4.0
+  - boost=1.84.0
   - gmp
   - mpfr
 
   # pybind11
-  - pybind11
+  - pybind11=2.11
 
   # optional（可視化など）
   - pymol-open-source
