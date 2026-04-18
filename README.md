@@ -13,9 +13,21 @@ C++（CGAL）と pybind11 を用いた体積計算モジュール。
 
 ---
 
+## Environment Setup
+
+このリポジトリには `environment.yml` が含まれています。
+以下のコマンドで環境を構築してください：
+
+```bash
+conda env create -f environment.yml
+conda activate pmv_calc_env
+```
+
+---
+
 ## Requirements
 
-以下の環境が必要です：
+主な依存関係：
 
 * CMake >= 3.14
 * Python (3.x)
@@ -25,7 +37,7 @@ C++（CGAL）と pybind11 を用いた体積計算モジュール。
 * Boost
 * GMP / MPFR
 
-### Python dependencies
+### Python packages
 
 * numpy
 * scipy
@@ -81,7 +93,7 @@ for ts in u.trajectory:
 ## Preprocessing (Important)
 
 正しい体積計算のためには、周期境界条件（PBC）の補正が必要です。
-以下のように GROMACS の `trjconv` を用いて前処理することを推奨します：
+以下のように GROMACS の `trjconv` を用いて前処理してください：
 
 ```bash
 echo 0 | gmx trjconv -f md.xtc -s md.tpr -o md_w.xtc -pbc whole
@@ -93,11 +105,20 @@ printf "1\n0\n" | gmx trjconv -f md_w_cluster.xtc -s md.tpr -o md_w_cluster_cent
 
 ---
 
+## Running Example
+
+```bash
+python python/main.py
+```
+
+---
+
 ## Project Structure
 
 ```
 pmv_calc/
 ├── CMakeLists.txt
+├── environment.yml
 ├── src/
 │   └── module.cpp
 ├── python/
@@ -119,7 +140,7 @@ pmv_calc/
 cmake -DCMAKE_PREFIX_PATH="/path/to/CGAL;/path/to/Eigen" ..
 ```
 
-* ビルドディレクトリ（`build/`）はリポジトリに含めないでください
+* `build/` ディレクトリはリポジトリに含めないでください（`.gitignore`で除外）
 
 ---
 
