@@ -61,18 +61,40 @@ make -j
 
 ビルドが成功すると、`pmv_calc*.so` が `build/` ディレクトリに生成されます。
 
-Pythonから利用するには、以下のいずれかを行ってください：
+---
 
-* `build/` ディレクトリで実行する
-* または `PYTHONPATH` に追加する
+## Pythonからの利用
 
-例：
+`pmv_calc` を import するには、以下のいずれかを行ってください。
+
+### 方法1：`build/` ディレクトリで実行
 
 ```bash
-export PYTHONPATH=$PWD/build:$PYTHONPATH
+cd build
+python ../python/main.py
 ```
 
 ---
+
+### 方法2：`PYTHONPATH` に追加（推奨）
+
+プロジェクトルートで：
+
+```bash
+export PYTHONPATH=$PWD/build:$PYTHONPATH
+python python/main.py
+```
+
+---
+
+### 方法3：モジュールをコピー
+
+```bash
+mkdir -p python
+cp build/pmv_calc*.so python/
+python python/main.py
+```
+
 
 ## Usage
 
