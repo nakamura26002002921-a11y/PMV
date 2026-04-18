@@ -2,10 +2,14 @@
 
 C++（CGAL）と pybind11 を用いた体積計算モジュール。
 
+---
+
 ## Overview
 
 `pmv_calc` は、C++で実装された体積計算関数を Python から呼び出せるようにした拡張モジュールです。
 高精度な幾何計算のために CGAL を使用しています。
+
+主に、分子動力学（MD）シミュレーションデータからの体積評価に利用することを想定しています。
 
 ---
 
@@ -20,6 +24,12 @@ C++（CGAL）と pybind11 を用いた体積計算モジュール。
 * Eigen3
 * Boost
 * GMP / MPFR
+
+### Python dependencies
+
+* numpy
+* scipy
+* MDAnalysis
 
 ---
 
@@ -38,7 +48,7 @@ make -j
 
 ## Usage
 
-Python から以下のように利用できます：
+### Pythonからの基本的な利用
 
 ```python
 import pmv_calc
@@ -53,6 +63,36 @@ result = pmv_calc.compute_volume(
 
 ---
 
+### MD trajectory を使った例
+
+```python
+import MDAnalysis as mda
+
+u = mda.Universe("md.pdb", "centered.xtc")
+protein = u.select_atoms("protein")
+
+for ts in u.trajectory:
+    coords = protein.positions
+    # Voronoi分割などを行い pmv_calc.compute_volume に渡す
+```
+
+---
+
+## Preprocessing (Important)
+
+正しい体積計算のためには、周期境界条件（PBC）の補正が必要です。
+以下のように GROMACS の `trjconv` を用いて前処理することを推奨します：
+
+```bash
+echo 0 | gmx trjconv -f md.xtc -s md.tpr -o md_w.xtc -pbc whole
+printf "1\n0\n" | gmx trjconv -f md_w.xtc -s md.tpr -o md_w_cluster.xtc -pbc cluster
+printf "1\n0\n" | gmx trjconv -f md_w_cluster.xtc -s md.tpr -o md_w_cluster_center.xtc -pbc mol -ur compact -center
+```
+
+その後、`md_w_cluster_center.xtc` を入力として使用してください。
+
+---
+
 ## Project Structure
 
 ```
@@ -60,7 +100,10 @@ pmv_calc/
 ├── CMakeLists.txt
 ├── src/
 │   └── module.cpp
-└── README.md
+├── python/
+│   └── main.py
+├── README.md
+└── LICENSE
 ```
 
 ---
@@ -75,6 +118,8 @@ pmv_calc/
 ```bash
 cmake -DCMAKE_PREFIX_PATH="/path/to/CGAL;/path/to/Eigen" ..
 ```
+
+* ビルドディレクトリ（`build/`）はリポジトリに含めないでください
 
 ---
 
