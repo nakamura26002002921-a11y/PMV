@@ -1,0 +1,32 @@
+name: pmv_calc_env
+
+channels:
+  - conda-forge
+  - defaults
+
+dependencies:
+  # Python
+  - python=3.10
+
+  # Python libs
+  - numpy
+  - scipy
+  - mdanalysis
+
+  # Build tools
+  - cmake
+  - make
+  - compilers
+
+  # C++ dependencies
+  - cgal
+  - eigen
+  - boost
+  - gmp
+  - mpfr
+
+  # pybind11
+  - pybind11
+
+  # optional（可視化など）
+  - pymol-open-source
