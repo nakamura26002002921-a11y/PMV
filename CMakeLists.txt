@@ -1,0 +1,18 @@
+cmake_minimum_required(VERSION 3.14)
+project(pmv_calc)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+find_package(pybind11 REQUIRED)
+find_package(CGAL REQUIRED)
+find_package(Eigen3 REQUIRED)
+find_package(Boost REQUIRED)
+find_library(GMP_LIBRARY NAMES gmp REQUIRED)
+find_library(MPFR_LIBRARY NAMES mpfr)
+pybind11_add_module(pmv_calc src/module.cpp)
+target_link_libraries(pmv_calc PRIVATE
+    CGAL::CGAL
+    Eigen3::Eigen
+    Boost::boost
+    ${GMP_LIBRARY}
+    ${MPFR_LIBRARY}
+)
