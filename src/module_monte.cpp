@@ -153,6 +153,9 @@ double func2(
         double sphere_volume = (4.0 / 3.0) * M_PI * std::pow(radius + r, 3);
         total_volume += sphere_volume * (static_cast<double>(count) / n_points);
     }
+    return total_volume;
+}
+
 
 PYBIND11_MODULE(monte, m) {
     m.doc() = "Monte Carlo volume calculation module";
@@ -169,6 +172,4 @@ PYBIND11_MODULE(monte, m) {
           py::arg("sel"),
           py::arg("r") = 0.0,
           py::arg("n_points") = 1000);
-}
-    return total_volume;
 }
