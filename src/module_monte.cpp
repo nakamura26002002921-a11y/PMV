@@ -157,13 +157,13 @@ double func2(
 }
 
 
-PYBIND11_MODULE(monte, m) {
+void register_monte_functions(py::module_ &m) {
     m.doc() = "Monte Carlo volume calculation module";
 
     m.def("func1", &func1, "Fast water distance calculation",
-          py::arg("atoms_py"), 
-          py::arg("water_coords_py"), 
-          py::arg("radiuses_py"), 
+          py::arg("atoms_py"),
+          py::arg("water_coords_py"),
+          py::arg("radiuses_py"),
           py::arg("r"));
 
     m.def("func2", &func2, "Monte Carlo volume calculation",
