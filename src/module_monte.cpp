@@ -153,5 +153,22 @@ double func2(
         double sphere_volume = (4.0 / 3.0) * M_PI * std::pow(radius + r, 3);
         total_volume += sphere_volume * (static_cast<double>(count) / n_points);
     }
+
+PYBIND11_MODULE(module_monte, m) {
+    m.doc() = "Monte Carlo volume calculation module";
+
+    m.def("func1", &func1, "Fast water distance calculation",
+          py::arg("atoms_py"), 
+          py::arg("water_coords_py"), 
+          py::arg("radiuses_py"), 
+          py::arg("r"));
+
+    m.def("func2", &func2, "Monte Carlo volume calculation",
+          py::arg("atoms"),
+          py::arg("radiuses"),
+          py::arg("sel"),
+          py::arg("r") = 0.0,
+          py::arg("n_points") = 1000);
+}
     return total_volume;
 }
