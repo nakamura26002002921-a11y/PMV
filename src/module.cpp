@@ -181,16 +181,10 @@ double compute_volume(const std::vector<Region>& REGIONS,
     return total_volume;
 }
 
-inline double dist_sq(const double* a, const double* b) {
-    double dx = a[0] - b[0];
-    double dy = a[1] - b[1];
-    double dz = a[2] - b[2];
-    return dx*dx + dy*dy + dz*dz;
-}
 
-int func1(py::array_t<double> atoms_py, 
-          py::array_t<double> water_coords_py, 
-          py::array_t<double> radiuses_py, 
+int func1(py::array_t<double> atoms_py,
+          py::array_t<double> water_coords_py,
+          py::array_t<double> radiuses_py,
           double r) {
     auto atoms = atoms_py.unchecked<2>();
     auto waters = water_coords_py.unchecked<2>();
@@ -200,46 +194,44 @@ int func1(py::array_t<double> atoms_py,
     int total_number = 0;
     #pragma omp parallel for reduction(+:total_number)
     for (int i = 0; i < (int)n_atoms; ++i) {
-        const double* pos_i = &atoms(i, 0);
-        double rad_i = radii(i);
-        std::vector<size_t> valid_waters;
-        std::vector<double> dist_i_w;
+        const double* atom_i = &atoms(i, 0);
+        double radius_i = radii(i);
+        std::vector<int> neighbor_atoms;
+        for (size_t j = 0; j < n_atoms; ++j) {
+            if (i == (int)j) continue;
+            double d2 = dist_sq(atom_i, &atoms(j, 0));
+            double threshold = radius_i + 2*r + radii(j);
+            if (d2 <= threshold * threshold) {
+                neighbor_atoms.push_back(j);
+            }
+        }
+        if (neighbor_atoms.empty()) continue;
+        std::vector<int> valid_waters;
+        std::vector<double> dist_iw;
         for (size_t w = 0; w < n_waters; ++w) {
-            double d2 = dist_sq(pos_i, &waters(w, 0));
-            double limit = rad_i + r;
+            double d2 = dist_sq(atom_i, &waters(w, 0));
+            double limit = radius_i + r;
             if (d2 < limit * limit) {
                 valid_waters.push_back(w);
-                dist_i_w.push_back(std::sqrt(d2));
+                dist_iw.push_back(std::sqrt(d2));
             }
         }
         if (valid_waters.empty()) continue;
-        std::vector<size_t> other_indices;
-        for (size_t j = 0; j < n_atoms; ++j) {
-            if (i == (int)j) continue;
-            double d2 = dist_sq(pos_i, &atoms(j, 0));
-            double limit = radii(i) + 2 * r + radii(j);
-            if (d2 <= limit * limit) {
-                other_indices.push_back(j);
-            }
-        }
-        if (other_indices.empty()) continue;
-        for (size_t idx = 0; idx < valid_waters.size(); ++idx) {
-            size_t w_idx = valid_waters[idx];
-            double d_iw = dist_i_w[idx];
-            const double* pos_w = &waters(w_idx, 0);
-            
-            bool all_condition = true;
-            for (size_t j : other_indices) {
+        int local_count = 0;
+        for (size_t wi = 0; wi < valid_waters.size(); ++wi) {
+            const double* pos_w = &waters(valid_waters[wi], 0);
+            double d_iw_val = dist_iw[wi];
+            bool ok = true;
+            for (size_t j : neighbor_atoms) {
                 double d_wj = std::sqrt(dist_sq(pos_w, &atoms(j, 0)));
-                if (!(d_iw * radii(j) < d_wj * rad_i)) {
-                    all_condition = false;
-                    break; 
+                if (!(d_iw_val * radii(j) < d_wj * radius_i)) {
+                    ok = false;
+                    break;
                 }
             }
-            if (all_condition) {
-                total_number++;
-            }
+            if (ok) local_count++;
         }
+        total_number += local_count;
     }
     return total_number;
 }
