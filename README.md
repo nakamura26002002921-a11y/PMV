@@ -169,7 +169,7 @@ pmv_calc/
 │   └── module.cpp
 ├── python/
 │   └── main.py
-├── mdfile/
+├── example/
 │   ├── md.pdb
 │   └── centered.xtc
 ├── README.md
