@@ -154,7 +154,7 @@ double func2(
         total_volume += sphere_volume * (static_cast<double>(count) / n_points);
     }
 
-PYBIND11_MODULE(module_monte, m) {
+PYBIND11_MODULE(monte, m) {
     m.doc() = "Monte Carlo volume calculation module";
 
     m.def("func1", &func1, "Fast water distance calculation",
