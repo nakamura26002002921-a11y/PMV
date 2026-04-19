@@ -36,7 +36,7 @@ def process_frame(protein, waters, radius):
         float(radius)
     )
     end = time.perf_counter()
-    number = pmv_calc.func1(points_atoms, np.zeros(points_atoms.shape[0]), water_coords, radius)
+    number = pmv_calc.func1(points_atoms, water_coords, np.zeros(points_atoms.shape[0], dtype=np.float64), radius)
     return end - start, total_volume, number
 
 def main():
