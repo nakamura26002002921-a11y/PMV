@@ -36,10 +36,7 @@ def process_frame(protein, waters, radius):
         float(radius)
     )
     end = time.perf_counter()
-    diff = points_atoms[:, None, :] - water_coords[None, :, :]
-    distances = np.linalg.norm(diff, axis=2)
-    mask = distances < radius
-    number = np.sum(np.any(mask, axis=0))
+    number = pmv_calc.func1(points_atoms, np.zeros_like(points_atoms), water_coords, radius)
     return end - start, total_volume, number
 
 def main():
