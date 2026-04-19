@@ -8,7 +8,7 @@ def load_system(pdb, xtc):
     u = mda.Universe(pdb, xtc)
     u.guess_TopologyAttrs(to_guess=["elements"])
     protein = u.select_atoms("protein")
-    waters = u.select_atoms("resname SOL and name O")
+    waters = u.select_atoms("resname SOL and name OW")
     return u, protein, waters
 
 def process_frame(protein, waters, radius):
