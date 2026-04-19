@@ -43,8 +43,8 @@ def process_frame(protein, waters, radius):
     return end - start, total_volume, number
 
 def main():
-    xtc = "centered.xtc"
-    pdb = "md.pdb"
+    xtc = "example/centered.xtc" # Define input files for analysis
+    pdb = "example/md.pdb" # Define input files for analysis
     u, protein, waters = load_system(pdb, xtc)
     protein_heavy = protein.select_atoms("not name H*")
     with open("result.txt", "w") as f:
