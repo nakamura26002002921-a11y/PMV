@@ -144,7 +144,7 @@ python python/main.py
 ```bash
 echo 0 | gmx trjconv -f md.xtc -s md.tpr -o md_w.xtc -pbc whole
 printf "1\n0\n" | gmx trjconv -f md_w.xtc -s md.tpr -o md_w_cluster.xtc -pbc cluster
-printf "1\n0\n" | gmx trjconv -f md_w_cluster.xtc -s md.tpr -o md_w_cluster_center.xtc -pbc mol -ur compact -center
+printf "1\n0\n" | gmx trjconv -f md_w_cluster.xtc -s md.tpr -o centered.xtc -pbc mol -ur compact -center
 ```
 
 その後、`md_w_cluster_center.xtc` を入力として使用してください。
