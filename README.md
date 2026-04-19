@@ -147,7 +147,7 @@ printf "1\n0\n" | gmx trjconv -f md_w.xtc -s md.tpr -o md_w_cluster.xtc -pbc clu
 printf "1\n0\n" | gmx trjconv -f md_w_cluster.xtc -s md.tpr -o centered.xtc -pbc mol -ur compact -center
 ```
 
-その後、`md_w_cluster_center.xtc` を入力として使用してください。
+その後、`centered.xtc` を入力として使用してください。
 
 ---
 
@@ -169,6 +169,9 @@ pmv_calc/
 │   └── module.cpp
 ├── python/
 │   └── main.py
+├── mdfile/
+│   ├── md.pdb
+│   └── centered.xtc
 ├── README.md
 └── LICENSE
 ```
