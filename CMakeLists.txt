@@ -3,6 +3,7 @@ project(pmv_calc)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
 find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
 find_package(pybind11 REQUIRED)
 find_package(CGAL REQUIRED)
@@ -13,12 +14,9 @@ find_package(OpenMP REQUIRED)
 find_library(GMP_LIBRARY NAMES gmp REQUIRED)
 find_library(MPFR_LIBRARY NAMES mpfr)
 
-pybind11_add_module(pmv_calc 
-    src/module.cpp 
-    src/module_monte.cpp
+pybind11_add_module(pmv_calc
+    src/module.cpp
 )
-
-include_directories(${Eigen3_INCLUDE_DIRS})
 
 target_link_libraries(pmv_calc PRIVATE
     CGAL::CGAL
