@@ -1,6 +1,5 @@
 import numpy as np
 import time
-from scipy.spatial import Voronoi
 import MDAnalysis as mda
 import pmv_calc
 
