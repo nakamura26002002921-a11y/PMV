@@ -199,48 +199,18 @@ int func1(py::array_t<double> atoms_py,
     size_t n_waters = waters.shape(0);
     int total_number = 0;
     #pragma omp parallel for reduction(+:total_number)
-    for (int i = 0; i < (int)n_atoms; ++i) {
-        const double pos_i[3] = {atoms(i, 0), atoms(i, 1), atoms(i, 2)};
-        double rad_i = radii(i);
-        std::vector<size_t> other_atoms_idx;
-        for (size_t j = 0; j < n_atoms; ++j) {
-            if (i == (int)j) continue; // distances > 0
-            double d2 = dist_sq(pos_i, &atoms(j, 0));
-            double threshold = rad_i + 2 * r + radii(j);
-            if (d2 <= threshold * threshold) {
-                other_atoms_idx.push_back(j);
-            }
-        }
-        std::vector<size_t> valid_waters_idx;
-        std::vector<double> dist_norms_i; // Python: dist_norms[i, mask_sol_i]
-        for (size_t w = 0; w < n_waters; ++w) {
-            double d2 = dist_sq(pos_i, &waters(w, 0));
-            double limit = rad_i + r;
+    for (int w = 0; w < (int)n_waters; ++w) {
+        const double* pos_w = &waters(w, 0);
+        for (size_t i = 0; i < n_atoms; ++i) {
+            const double* pos_i = &atoms(i, 0);
+            double radius_i = radii(i);
+            double d2 = dist_sq(pos_w, pos_i);
+            double limit = radius_i + r;
             if (d2 < limit * limit) {
-                valid_waters_idx.push_back(w);
-                dist_norms_i.push_back(std::sqrt(d2));
+                total_number++;
+                break; 
             }
         }
-        if (other_atoms_idx.empty() || valid_waters_idx.empty()) continue;
-        int atom_i_count = 0;
-        for (size_t wi = 0; wi < valid_waters_idx.size(); ++wi) {
-            size_t w_idx = valid_waters_idx[wi];
-            double d_iw = dist_norms_i[wi];
-            const double pos_w[3] = {waters(w_idx, 0), waters(w_idx, 1), waters(w_idx, 2)};
-            bool all_less = true;
-            for (size_t j : other_atoms_idx) {
-                double d_wj = std::sqrt(dist_sq(pos_w, &atoms(j, 0)));
-                if (!(d_iw * radii(j) < d_wj * rad_i)) {
-                    all_less = false;
-                    break;
-                }
-            }
-            
-            if (all_less) {
-                atom_i_count++;
-            }
-        }
-        total_number += atom_i_count;
     }
     return total_number;
 }
