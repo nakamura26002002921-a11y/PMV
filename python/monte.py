@@ -2,7 +2,7 @@ import numpy as np
 import time
 from scipy.spatial import Voronoi
 import MDAnalysis as mda
-import module
+import pmv_calc
 
 def load_system(pdb, xtc):
     u = mda.Universe(pdb, xtc)
@@ -16,11 +16,11 @@ def monte_volume(protein, waters, r, max_iter=10, n_points=1000):
     waters = waters.positions
     radius_dict = {'C':1.7,'H':1.2,'O':1.52,'N':1.55,'S':1.8}
     radiuses = np.array([radius_dict[e] for e in protein.elements])
-    number = module.func1(atoms, radiuses, waters, r)
+    number = pmv_calc.func1(atoms, radiuses, waters, r)
     times, results = [], []
     for _ in range(max_iter):
         start = time.perf_counter()
-        result = module.func2(atoms, radiuses, r, n_points)
+        result = pmv_calc.func2(atoms, radiuses, r, n_points)
         end = time.perf_counter()
         times.append(end - start)
         results.append(result)
