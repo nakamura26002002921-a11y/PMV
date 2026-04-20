@@ -1,18 +1,3 @@
-# pmv_calc
-
-C++（CGAL）と pybind11 を用いた体積計算モジュール。
-
----
-
-## Overview
-
-`pmv_calc` は、C++で実装された体積計算関数を Python から呼び出せるようにした拡張モジュールです。
-高精度な幾何計算のために CGAL を使用しています。
-
-主に、分子動力学（MD）シミュレーションデータからの体積評価に利用することを想定しています。
-
----
-
 ## Environment Setup
 
 このリポジトリには `environment.yml` が含まれています。
@@ -63,80 +48,89 @@ make -j
 
 ---
 
-## Pythonからの利用
+## 実行方法
 
-`pmv_calc` を import するには、以下のいずれかを行ってください。
+### 入力データ
 
-### 方法1：`build/` ディレクトリで実行
+以下の2つが必要：
 
-```bash
-cd build
-python ../python/main.py
-```
+* `md.pdb`
+* `centered.xtc`
 
----
 
-### 方法2：`PYTHONPATH` に追加（推奨）
-
-プロジェクトルートで：
+### 1. Monte Carlo 法（低速・近似）
 
 ```bash
 export PYTHONPATH=$PWD/build:$PYTHONPATH
-python python/main.py
+python python/monte.py
 ```
 
----
 
-### 方法3：モジュールをコピー
+### 2. Voronoi 法（高速・高精度）
 
 ```bash
-mkdir -p python
-cp build/pmv_calc*.so python/
-python python/main.py
+export PYTHONPATH=$PWD/build:$PYTHONPATH
+python python/voronoi.py
 ```
 
 
-## Usage
+## 出力ファイル
 
-### Pythonからの基本的な利用
-
-```python
-import pmv_calc
-
-result = pmv_calc.compute_volume(
-    REGIONS,   # Voronoi領域インデックス
-    VERTICES,  # Voronoi頂点座標
-    POINTS,    # 原子座標
-    RADIUS     # 半径
-)
-```
+どちらも `result.txt` を生成
 
 ---
 
-### MD trajectory を使った例
+### Monte Carlo の出力
 
-```python
-import MDAnalysis as mda
-import pmv_calc
-
-u = mda.Universe("md.pdb", "centered.xtc")
-protein = u.select_atoms("protein")
-
-for ts in u.trajectory:
-    coords = protein.positions
-    # Voronoi分割などを行い pmv_calc.compute_volume に渡す
 ```
+frame   time   volume   variance   water_count
+```
+
+#### 各列の意味
+
+* **frame**: フレーム番号
+* **time**: 計算時間（秒）
+* **volume**: 推定体積(ファンデルワールス体積)
+* **variance**: Monte Carlo のばらつき
+* **water_count**: タンパク質近傍の水分子数
 
 ---
 
-### 実行例
+### Voronoi の出力
 
-```bash
-python python/main.py
+```
+frame   time   volume   water_count
 ```
 
+#### 各列の意味
 
-## Preprocessing (Important)
+* **frame**: フレーム番号
+* **time**: 計算時間（秒）
+* **volume**: 厳密体積
+* **water_count**: タンパク質近傍の水分子数
+
+
+
+## Project Structure
+
+```
+pmv_calc/
+├── src/
+│   └── module.cpp
+├── python/
+│   ├── monte.py
+│   └── voronoi.py
+├── example/
+│   ├── md.pdb
+│   └── centered.xtc
+├── CMakeLists.txt
+├── environment.yml
+└── README.md
+```
+
+## 補足
+
+### PBC補正
 
 正しい体積計算のためには、周期境界条件（PBC）の補正が必要です。
 以下のように GROMACS の `trjconv` を用いて前処理してください：
@@ -146,52 +140,6 @@ echo 0 | gmx trjconv -f md.xtc -s md.tpr -o md_w.xtc -pbc whole
 printf "1\n0\n" | gmx trjconv -f md_w.xtc -s md.tpr -o md_w_cluster.xtc -pbc cluster
 printf "1\n0\n" | gmx trjconv -f md_w_cluster.xtc -s md.tpr -o centered.xtc -pbc mol -ur compact -center
 ```
-
-その後、`centered.xtc` を入力として使用してください。
-
----
-
-## Running Example
-
-```bash
-python python/main.py
-```
-
----
-
-## Project Structure
-
-```
-pmv_calc/
-├── CMakeLists.txt
-├── environment.yml
-├── src/
-│   └── module.cpp
-├── python/
-│   └── main.py
-├── example/
-│   ├── md.pdb
-│   └── centered.xtc
-├── README.md
-└── LICENSE
-```
-
----
-
-## Notes
-
-* CGAL は GMP / MPFR に依存しています
-* 環境によっては `CMAKE_PREFIX_PATH` の指定が必要です
-
-例：
-
-```bash
-cmake -DCMAKE_PREFIX_PATH="/path/to/CGAL;/path/to/Eigen" ..
-```
-
-* `build/` ディレクトリはリポジトリに含めないでください（`.gitignore`で除外）
-
----
 
 ## License
 
