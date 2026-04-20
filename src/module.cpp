@@ -181,6 +181,13 @@ double compute_volume(const std::vector<Region>& REGIONS,
     return total_volume;
 }
 
+inline double dist_sq(const double* a, const double* b) {
+	double dx = a[0] - b[0];
+	double dy = a[1] - b[1];
+	double dz = a[2] - b[2];
+	return dx*dx + dy*dy + dz*dz;
+}
+
 int func1(py::array_t<double> atoms_py, 
           py::array_t<double> water_coords_py, 
           py::array_t<double> radiuses_py, 
